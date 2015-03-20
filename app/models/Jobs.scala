@@ -12,18 +12,15 @@ case class Job(
     isOpen: Boolean
 )
 
-class Jobs(tag: Tag) extends Table[Job](tag, "JOBS") {
+class Jobs(tag: Tag) extends Table[Job](tag, "JOBS") with Model {
   def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
   def title = column[String]("TITLE", O.NotNull)
   def lowerPayLevel = column[Double]("LOWER_PAY_LEVEL")
   def upperPayLevel = column[Double]("UPPER_PAY_LEVEL")
-  def isOpen = column[Boolean]("IS_OPEN")
+  def isOpen = column[Boolean]("IS_OPEN", O.NotNull, O.Default(false))
   
   def * = (id.?, title, lowerPayLevel, upperPayLevel, isOpen) <> (Job.tupled, Job.unapply)
 }
 
-object Jobs extends BaseSlickModel {
-  lazy val jobs = TableQuery[Jobs]
-  def all = DB withSession { implicit session => jobs.list }
-  def size = DB withSession { implicit session => jobs.length.run }
+object Jobs extends BaseSlickModel(TableQuery[Jobs]) {
 }
