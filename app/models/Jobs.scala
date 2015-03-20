@@ -5,15 +5,15 @@ import play.api.db.slick.DB
 import play.api.db.slick.Config.driver.simple._
 
 case class Job(
-    id: Int,
+    id: Option[Int],
     title: String,
     lowerPayLevel: Double,
     upperPayLevel: Double,
     isOpen: Boolean
 ) extends Model
 
-class Jobs(tag: Tag) extends ModelTable[Job](tag, "JOBS") {
-  def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+class Jobs(tag: Tag) extends Table[Job](tag, "JOBS") {
+  def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
   def title = column[String]("TITLE", O.NotNull)
   def lowerPayLevel = column[Double]("LOWER_PAY_LEVEL")
   def upperPayLevel = column[Double]("UPPER_PAY_LEVEL")

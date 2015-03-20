@@ -4,28 +4,39 @@ import play.api.Play.current
 import play.api.db.slick.DB
 import play.api.db.slick.Config.driver.simple._
 import java.sql.SQLException
-import scala.util.Try
-import scala.slick.lifted.ProvenShape
+import scala.util.{Try, Failure, Success}
 
-trait Model
-abstract class ModelTable[T <: Model](tag: Tag, tableName: String) extends Table[T](tag, tableName) 
+/**
+ * Base Model for reference.
+ */
+trait Model 
 
-abstract class BaseSlickModel[E <: Model, T <: ModelTable[E]] {
-  var model: TableQuery[T] = null
-  
-  def all = DB withSession { implicit session => model.list }
-  def size = DB withSession { implicit session => model.length.run }
-  def +=(e: E): Try[E] = Try { DB withSession { implicit session =>
-      model.+=(e)
-      e
-  }}
-}
-
+/**
+ * Collection of freebie queries.
+ */
 trait BaseSlickTrait[E <: Model] {
-  def model: TableQuery[_ <: ModelTable[E]]
+  
+  /**
+   * The table and connection to base off.
+   */
+  def model: TableQuery[_ <: Table[E]]
+  
+  /**
+   * Selects all the rows from the current table.
+   * @return Retrieves all rows as if 'SELECT *'
+   */
   def all = DB withSession { implicit session => model.list }
+  
+  /**
+   * Gets the count of the current table.
+   * @return The count as if 'SELECT COUNT(*)'
+   */
   def size = DB withSession { implicit session => model.length.run }
-  def +=(e: E): Try[E] = Try { DB withSession { implicit session =>
-      (model returning model.map(c => c)) += e
-  }}
+  
+  /**
+   * Adds item to the collection.
+   * @param e The new entity to add to the table.
+   * @return by default returns the number of rows inserted.
+   */
+  def +=(e: E): Try[Int] = Try { DB withSession { implicit session => model += e } }
 }

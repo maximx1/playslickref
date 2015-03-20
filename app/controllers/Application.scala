@@ -6,6 +6,8 @@ import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import com.github.tototoshi.play2.json4s.jackson._
 import models._
+import scala.util.{Try, Success, Failure}
+import java.sql.SQLException
 
 object Application extends Controller with Json4s {
     implicit val format = DefaultFormats
@@ -31,7 +33,11 @@ object Application extends Controller with Json4s {
     
     def createEmployee = Action(json) { implicit request =>
       val newEmployee = request.body.extract[Employee]
-      Employees += newEmployee
-      Ok(Extraction.decompose(BaseResponse("ok", "")))
+      val result = Employees += newEmployee
+      Ok(Extraction.decompose(result match {
+        case Success(id) => BaseResponse("ok", "New id: " + id)
+        case Failure(e: SQLException) => BaseResponse("fail", "SQL Error: " + e.getMessage)
+        case _ => BaseResponse("fail", "Unspecified error")
+      }))
     }
 }
