@@ -5,7 +5,7 @@ import play.api.mvc._
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import com.github.tototoshi.play2.json4s.jackson._
-import models.{Jobs, Employees}
+import models._
 
 object Application extends Controller with Json4s {
     implicit val format = DefaultFormats
@@ -27,5 +27,11 @@ object Application extends Controller with Json4s {
     
     def employeeById(id: Int) = Action { implicit request => 
       Ok(Extraction.decompose(Employees.byId(id)))
+    }
+    
+    def createEmployee = Action(json) { implicit request =>
+      val newEmployee = request.body.extract[Employee]
+      Employees += newEmployee
+      Ok(Extraction.decompose(BaseResponse("ok", "")))
     }
 }
