@@ -19,8 +19,15 @@ class Employees(tag: Tag) extends Table[Employee](tag, "EMPLOYEES") with Model {
   def email = column[String]("EMAIL")
   def jobId = column[Int]("JOB_ID")
   def * =  (id.?, firstName, lastName, email, jobId) <> (Employee.tupled, Employee.unapply)
-  
-  def job = foreignKey("JOBS", jobId, TableQuery[Jobs])(_.id)
 }
 
-object Employees extends BaseSlickModel(TableQuery[Employees])
+object Employees extends BaseSlickModel(TableQuery[Employees]) {
+  val employees: TableQuery[Employees] = model match {case x: TableQuery[Employees] => x}
+  def byId(id: Int) = DB withSession { implicit session => employees.filter{_.id.? === id}.list }
+  def getJobsForEmployee(id: Int) = DB withSession { implicit session =>
+    employees.filter(_.id === id)
+      .flatMap(x => 
+        Jobs.jobs.filter(_.id === x.jobId)
+      ).list
+  }
+}

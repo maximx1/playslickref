@@ -6,7 +6,7 @@ import play.api.db.slick.Config.driver.simple._
 
 trait Model
 
-abstract class BaseSlickModel(val m: TableQuery[_ <: Model]) {
-  def all = DB withSession { implicit session => m.list }
-  def size = DB withSession { implicit session => m.length.run }
+abstract class BaseSlickModel(val model: TableQuery[_ <: Model]) {
+  def all = DB withSession { implicit session => model.list }
+  def size = DB withSession { implicit session => model.length.run }
 }

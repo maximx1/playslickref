@@ -23,4 +23,6 @@ class Jobs(tag: Tag) extends Table[Job](tag, "JOBS") with Model {
 }
 
 object Jobs extends BaseSlickModel(TableQuery[Jobs]) {
+  val jobs: TableQuery[Jobs] = model match {case x: TableQuery[Jobs] => x}
+  def byId(id: Int) = DB withSession { implicit session => jobs.filter(_.id === id).list }
 }
