@@ -4,7 +4,7 @@ import play.api.Play.current
 import play.api.db.slick.DB
 import play.api.db.slick.Config.driver.simple._
 import java.sql.SQLException
-import scala.util.{Try, Failure, Success}
+import scala.util.Try
 
 /**
  * Base Model for reference.

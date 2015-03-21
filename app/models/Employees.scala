@@ -3,6 +3,7 @@ package models
 import play.api.Play.current
 import play.api.db.slick.DB
 import play.api.db.slick.Config.driver.simple._
+import scala.util.Try
 
 case class Employee(
   id: Option[Int],
@@ -32,4 +33,8 @@ object Employees extends BaseSlickTrait[Employee] {
         Jobs.model.filter(_.id === x.jobId)
       ).list
   }
+  
+  override def +=(e: Employee): Try[Int] = Try { DB withSession { implicit session => 
+    (model returning model.map(_.id.get)) += e
+  }}
 }
