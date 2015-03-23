@@ -9,6 +9,8 @@ import models._
 import scala.util.{Try, Success, Failure}
 import java.sql.SQLException
 
+case class BatchEmployees(employees: Seq[Employee])
+
 object Application extends Controller with Json4s {
     implicit val format = DefaultFormats
     
@@ -36,6 +38,16 @@ object Application extends Controller with Json4s {
       val result = Employees += newEmployee
       Ok(Extraction.decompose(result match {
         case Success(id) => BaseResponse("ok", "New id: " + id)
+        case Failure(e: SQLException) => BaseResponse("fail", "SQL Error: " + e.getMessage)
+        case _ => BaseResponse("fail", "Unspecified error")
+      }))
+    }
+    
+    def createEmployees = Action(json) { implicit request =>
+      val contents = request.body.extract[BatchEmployees]
+      val result = Employees ++= contents.employees
+      Ok(Extraction.decompose(result match {
+        case Success(id) => BaseResponse("ok", id.get.toString)
         case Failure(e: SQLException) => BaseResponse("fail", "SQL Error: " + e.getMessage)
         case _ => BaseResponse("fail", "Unspecified error")
       }))

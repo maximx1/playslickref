@@ -39,4 +39,11 @@ trait BaseSlickTrait[E <: Model] {
    * @return by default returns the number of rows inserted.
    */
   def +=(e: E): Try[Int] = Try { DB withSession { implicit session => model += e } }
+  
+  /**
+   * Add items to the collection in batch.
+   * @param e The entities to add.
+   * @return By default returns the number of rows inserted.
+   */
+  def ++=(e: Seq[E]): Try[Option[Int]] = Try { DB withSession { implicit session => model ++= e }}
 }
