@@ -2,19 +2,24 @@ package controllers
 
 import play.api.libs.json._
 import play.api.mvc._
+import play.api.cache.Cached
+import play.api.Play.current
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import com.github.tototoshi.play2.json4s.jackson._
 import models._
 import scala.util.{Try, Success, Failure}
 import java.sql.SQLException
+import org.pegdown.PegDownProcessor
 
 case class BatchEmployees(employees: Seq[Employee])
 
 object Application extends Controller with Json4s {
     implicit val format = DefaultFormats
     
-    def index = TODO
+    def index = Cached("routes") { Action {
+      Ok(views.html.index((new PegDownProcessor).markdownToHtml(RoutesList.list)))
+    }}
     
     def allJobs = Action { implicit request =>
       Ok(Extraction.decompose(Jobs.all))
