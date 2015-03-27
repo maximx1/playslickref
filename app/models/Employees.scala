@@ -23,7 +23,9 @@ class Employees(tag: Tag) extends Table[Employee](tag, "EMPLOYEES") {
 }
 
 object Employees extends BaseSlickTrait[Employee] {
-  def model = TableQuery[Employees]
+  val backingTable = TableQuery[Employees]
+  
+  def model = backingTable
   
   def byId(id: Int) = DB withSession { implicit session => model.filter{_.id === id}.list}
   
